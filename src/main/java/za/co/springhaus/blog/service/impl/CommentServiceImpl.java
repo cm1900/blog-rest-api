@@ -3,21 +3,32 @@ package za.co.springhaus.blog.service.impl;
 import org.springframework.stereotype.Service;
 import za.co.springhaus.blog.dto.CommentDto;
 import za.co.springhaus.blog.entity.Comment;
+import za.co.springhaus.blog.entity.Post;
+import za.co.springhaus.blog.exception.ResourceNotFoundException;
 import za.co.springhaus.blog.repository.CommentRepository;
+import za.co.springhaus.blog.repository.PostRepository;
 import za.co.springhaus.blog.service.CommentService;
 
 @Service
 public class CommentServiceImpl implements CommentService {
 
     private CommentRepository commentRepository;
+    private PostRepository postRepository;
 
-    public CommentServiceImpl(CommentRepository commentRepository) {
+    public CommentServiceImpl(CommentRepository commentRepository, PostRepository postRepository) {
         this.commentRepository = commentRepository;
+        this.postRepository = postRepository;
     }
 
     @Override
     public CommentDto createComment(long postId, CommentDto commentDto) {
-        return null;
+        Comment comment = mapToEntity(commentDto);
+
+        Post post = postRepository.findById(postId).orElseThrow(()-> new ResourceNotFoundException("Post", "id", postId));
+
+        comment.setPost(post);
+
+        return mapToDto(commentRepository.save(comment));
     }
 
     private CommentDto mapToDto(Comment comment){
