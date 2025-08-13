@@ -9,6 +9,9 @@ import za.co.springhaus.blog.repository.CommentRepository;
 import za.co.springhaus.blog.repository.PostRepository;
 import za.co.springhaus.blog.service.CommentService;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class CommentServiceImpl implements CommentService {
 
@@ -29,6 +32,13 @@ public class CommentServiceImpl implements CommentService {
         comment.setPost(post);
 
         return mapToDto(commentRepository.save(comment));
+    }
+
+    @Override
+    public List<CommentDto> getCommentsByPostId(long postId) {
+        List<Comment> comments = commentRepository.findByPostId(postId);
+
+        return comments.stream().map(comment -> mapToDto(comment)).collect(Collectors.toList());
     }
 
     private CommentDto mapToDto(Comment comment){
