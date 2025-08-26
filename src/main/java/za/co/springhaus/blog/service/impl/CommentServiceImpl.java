@@ -1,9 +1,11 @@
 package za.co.springhaus.blog.service.impl;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import za.co.springhaus.blog.dto.CommentDto;
 import za.co.springhaus.blog.entity.Comment;
 import za.co.springhaus.blog.entity.Post;
+import za.co.springhaus.blog.exception.BlogAPIException;
 import za.co.springhaus.blog.exception.ResourceNotFoundException;
 import za.co.springhaus.blog.repository.CommentRepository;
 import za.co.springhaus.blog.repository.PostRepository;
@@ -35,10 +37,22 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDto> getCommentsByPostId(long postId) {
+    public List<CommentDto> getCommentById(long postId) {
         List<Comment> comments = commentRepository.findByPostId(postId);
 
         return comments.stream().map(comment -> mapToDto(comment)).collect(Collectors.toList());
+    }
+
+    @Override
+    public CommentDto getCommentsByPostId(long postId, long commentId) {
+        Post post = postRepository.findById(postId).orElseThrow(()-> new ResourceNotFoundException("Post", "id", postId));
+
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment", "id", commentId));
+
+        if(!comment.getPost().getId().equals(post.getId())){
+            throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Comment does not belong to post");
+        }
+        return mapToDto(comment);
     }
 
     private CommentDto mapToDto(Comment comment){
