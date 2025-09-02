@@ -5,13 +5,13 @@ import za.co.springhaus.blog.dto.CommentDto;
 import java.util.List;
 
 public interface CommentService {
-    CommentDto createComment(long postId, CommentDto commentDto);
+    CommentDto createComment(Long postId, CommentDto commentDto);
 
-    List<CommentDto> getCommentsByPostId(long postId);
+    List<CommentDto> getCommentsByPostId(Long postId);
 
-    CommentDto getCommentById(long postId, long commentId);
+    CommentDto getCommentById(Long postId, Long commentId);
 
-    CommentDto updateComment(long postId, long commentId, CommentDto commentDto);
+    CommentDto updateComment(Long postId, Long commentId, CommentDto commentDto);
 
-    void deleteComment(long postId, long commentId);
+    void deleteComment(Long postId, Long commentId);
 }
