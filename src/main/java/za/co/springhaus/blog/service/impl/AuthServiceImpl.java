@@ -14,6 +14,7 @@ import za.co.springhaus.blog.entity.User;
 import za.co.springhaus.blog.exception.BlogAPIException;
 import za.co.springhaus.blog.repository.RoleRepository;
 import za.co.springhaus.blog.repository.UserRepository;
+import za.co.springhaus.blog.security.JwtTokenProvider;
 import za.co.springhaus.blog.service.AuthService;
 
 import java.util.HashSet;
@@ -26,16 +27,19 @@ public class AuthServiceImpl implements AuthService {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
+    private JwtTokenProvider jwtTokenProvider;
 
     public AuthServiceImpl(AuthenticationManager authenticationManager,
                            UserRepository userRepository,
                            RoleRepository roleRepository,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           JwtTokenProvider jwtTokenProvider) {
 
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Override
@@ -45,7 +49,8 @@ public class AuthServiceImpl implements AuthService {
                 loginDto.getUsernameOrEmail(), loginDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return "User logged in successfully!";
+
+        return jwtTokenProvider.generateToken(authentication);
     }
 
     @Override
